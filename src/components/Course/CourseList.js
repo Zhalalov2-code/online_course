@@ -13,11 +13,10 @@ const CourseList = ({ user }) => {
   const API_URL = 'http://localhost/school/courses';
   const API_ENROLLMENTS_URL = 'http://localhost/school/course_enrollments';
   const userId = user?.id != null ? String(user.id) : null;
-  const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set());
+  
 
   const fetchEnrollments = useCallback(async () => {
     if (!userId) {
-      setEnrolledCourseIds(new Set());
       return new Set();
     }
     try {
@@ -32,11 +31,9 @@ const CourseList = ({ user }) => {
           collected.add(String(courseId));
         }
       });
-      setEnrolledCourseIds(collected);
       return collected;
     } catch (err) {
       console.error('Ошибка загрузки записей на курсы:', err);
-      setEnrolledCourseIds(new Set());
       return new Set();
     }
   }, [API_ENROLLMENTS_URL, userId]);
@@ -139,16 +136,16 @@ const CourseList = ({ user }) => {
         timeout: 15000,
       });
       console.log('Course enrollment saved for course:', courseId);
-      await fetchEnrollments();
+  const enrollmentSet = await fetchEnrollments();
       setCourses(prev => prev.map(course => 
         course.id === courseId 
           ? { ...course, enrolled: true, students_count: (course.students_count || 0) + 1 }
-          : course
+          : { ...course, enrolled: enrollmentSet.has(String(course.id)) }
       ));
       setFilteredCourses(prev => prev.map(course => 
         course.id === courseId 
           ? { ...course, enrolled: true }
-          : course
+          : { ...course, enrolled: enrollmentSet.has(String(course.id)) }
       ));
     } catch (error) {
       console.error('Ошибка записи на курс:', error);
