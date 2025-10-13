@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const Register = ({ onLogin }) => {
   const [user, setUser] = useState(
-    { name: '', email: '', password: '', confirmPassword: '', role: 'student' }
+    { name: '', email: '', password: '', confirmPassword: '', role: 'student', avatar: '' },
   );
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -13,8 +13,12 @@ const Register = ({ onLogin }) => {
   const API_URL = 'http://localhost/school/users';
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser(prev => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    if(type === 'file') {
+        setUser(prev => ({ ...prev, [name]: e.target.files[0] }));
+    }else{
+        setUser(prev => ({ ...prev, [name]: value }));
+    }
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -38,6 +42,12 @@ const Register = ({ onLogin }) => {
     if (user.password !== user.confirmPassword) {
       newErrors.confirmPassword = 'Пароли не совпадают';
     }
+    if (!user.role) {
+        newErrors.role = 'Выберите роль';
+    }
+    if (!user.avatar) {
+        newErrors.avatar = 'Выберите аватар';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -50,15 +60,21 @@ const Register = ({ onLogin }) => {
   console.log('[Register] API_URL', API_URL);
     try {
       
-      const body = new URLSearchParams();
-      body.append('name', user.name || '');
-      body.append('email', user.email || '');
-      body.append('password', user.password || '');
-      body.append('role', user.role || 'student');
+      const form = new FormData();
+      form.append('name', user.name || '');
+      form.append('email', user.email || '');
+      form.append('password', user.password || '');
+      form.append('role', user.role || 'student');
+      if(user.avatar instanceof File) {
+          form.append('avatar', user.avatar);
+      }
 
 
-      const response = await axios.post(API_URL, body, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      const response = await axios({
+          method: 'post',
+          url: API_URL,
+          data: form,
+          headers: {'Content-Type': 'multipart/form-data'},
         timeout: 15000,
       });
 
@@ -211,6 +227,10 @@ const Register = ({ onLogin }) => {
               <span className="error-message">{errors.confirmPassword}</span>
             )}
           </div>
+
+            <div className="form-group">
+                <input type="file" id="avatar" name="avatar" onChange={handleChange} className="form-input" disabled={isLoading} />
+            </div>
 
           <div className="form-actions">
             <button

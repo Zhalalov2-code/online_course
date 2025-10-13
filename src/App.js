@@ -12,6 +12,7 @@ import LessonDetail from './pages/LessonDetail';
 import Results from './pages/Results';
 import { AuthProvider, useAuth } from './utils/authContext';
 import './css/App.css';
+import Profile from './pages/profile';
 
 function AppInner() {
   const { user, isLoading, login, logout } = useAuth();
@@ -76,16 +77,7 @@ function AppInner() {
           path="/profile"
           element={
             user ? (
-              <div className="container container-padded">
-                <div className="card">
-                  <div className="card-body">
-                    <h1>Профиль пользователя</h1>
-                    <p>Добро пожаловать, {user.name}!</p>
-                    <p>Email: {user.email}</p>
-                    <p>Роль: {user.role}</p>
-                  </div>
-                </div>
-              </div>
+              <Profile />
             ) : (
               <Navigate to="/login" />
             )
