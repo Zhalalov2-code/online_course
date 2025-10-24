@@ -1,8 +1,50 @@
-import {useAuth} from "../utils/authContext.js";
+import { useAuth } from "../utils/authContext.js";
 import "../css/profile.css";
+import { useState } from "react";
+import ModalEditProfile from "../components/profile/modalEditProfile";
+import axios from "axios";
 
 function Profile() {
-    const {user, isLoading} = useAuth();
+    const { user, isLoading } = useAuth();
+    const [isOpenModal, setIsOpenModal] = useState(false);
+    const { setUser } = useAuth();
+
+    const handleOpenModal = () => {
+        setIsOpenModal(true);
+    }
+
+    const handleCloseModal = () => {
+        setIsOpenModal(false);
+    }
+
+    const handleSave = async (formData) => {
+        try {
+            const formDataToSend = new FormData();
+
+            formDataToSend.append('id', user.id);
+            formDataToSend.append('name', formData.name || '');
+            formDataToSend.append('email', formData.email || '');
+
+            if (formData.avatar instanceof File) {
+                formDataToSend.append('avatar', formData.avatar);
+            }
+
+            const res = await axios({
+                method: 'POST',
+                url: 'http://localhost/school/update',
+                data: formDataToSend,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            setIsOpenModal(false);
+            console.log('ответ от сервера', res.data)
+            setUser(res.data.user);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+        } catch (err) {
+            return console.log(err);
+        }
+    }
 
     if (isLoading) {
         return <div>Загрузка...</div>
@@ -11,20 +53,24 @@ function Profile() {
         return <div>Пожалуйста, войдите в систему, чтобы просмотреть ваш профиль.</div>
     }
 
-    return (
-        <div className="profile-container">
-            <h1 className="profile-title">Профиль пользователя</h1>
-            <div className="user-avatar-profile">
-                <img src={user.avatar} alt="Avatar" className="user-avatar" />
-            </div>
-            <div className="profile-info">
-                <p><b>Имя:</b> {user.name}</p>
-                <p><b>Электронная почта:</b> {user.email}</p>
-                <p><b>Телефон:</b> {user.phone}</p>
-                <p><b>Роль:</b> {user.role}</p>
-            </div>
+    return (<div className="profile-container">
+        <h1 className="profile-title">Профиль пользователя</h1>
+        <div className="user-avatar-profile">
+            <img src={`http://localhost/school/uploads/${user.avatar}`} alt="Avatar" className="user-avatar" />
         </div>
-    )
+        <button className="edit-profile-button" onClick={handleOpenModal}>Редактировать профиль</button>
+        <div className="profile-info">
+            <p><b>Имя:</b> {user.name}</p>
+            <p><b>Электронная почта:</b> {user.email}</p>
+            <p><b>Роль:</b> {user.role}</p>
+        </div>
+        <ModalEditProfile
+            isOpen={isOpenModal}
+            onClose={handleCloseModal}
+            userData={user}
+            onSave={handleSave}
+        />
+    </div>)
 }
 
 export default Profile;

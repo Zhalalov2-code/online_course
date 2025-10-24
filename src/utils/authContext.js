@@ -10,11 +10,30 @@ export const AuthProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-        setIsLoading(false);
+            // Безопасно читаем пользователя из localStorage
+            try {
+                const raw = localStorage.getItem('user');
+                // Фильтруем часто встречающиеся невалидные строки
+                if (raw && raw !== 'undefined' && raw !== 'null') {
+                    try {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && typeof parsed === 'object') {
+                            setUser(parsed);
+                        } else {
+                            // Некорректное содержимое — очищаем
+                            localStorage.removeItem('user');
+                        }
+                    } catch (e) {
+                        // Невалидный JSON — очищаем
+                        localStorage.removeItem('user');
+                    }
+                } else if (raw) {
+                    // raw существует, но это строка 'undefined'/'null' — очищаем
+                    localStorage.removeItem('user');
+                }
+            } finally {
+                setIsLoading(false);
+            }
     }, []);
 
     const login = async (email, password) => {
@@ -51,10 +70,10 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
     };
 
-    return (
-        <AuthContext.Provider value={{ user, isLoading, login, logout }}>
-            {children}
-        </AuthContext.Provider>
+        return (
+            <AuthContext.Provider value={{ user, isLoading, login, logout, setUser }}>
+                {children}
+            </AuthContext.Provider>
     );
 };
 

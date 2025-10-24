@@ -62,8 +62,12 @@ const Header = ({ user, onLogout }) => {
                   className="user-button"
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
-                  <div className="user-avatar">
-                    {user.name.charAt(0).toUpperCase()}
+                  <div className="user-avatar-container-header">
+                    {user.avatar ? (
+                      <img src={`http://localhost/school/uploads/${user.avatar}`} alt="Avatar" className="user-avatar-header" />
+                    ) : (
+                      user.name.charAt(0).toUpperCase()
+                    )}
                   </div>
                   <span className="user-name">{user.name}</span>
                   <svg className="dropdown-icon" viewBox="0 0 20 20" fill="currentColor">

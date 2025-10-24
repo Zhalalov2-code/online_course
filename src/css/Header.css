@@ -51,6 +51,14 @@
   background-clip: text;
 }
 
+.user-avatar-header{
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 100%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+}
+
 /* Навигация для десктопа */
 .nav-desktop {
   display: flex;
