@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const Register = ({ onLogin }) => {
   const [user, setUser] = useState(
-    { name: '', email: '', password: '', confirmPassword: '', role: 'student', avatar: '' },
+    { name: '', email: '', password: '', confirmPassword: '', role: 'student', avatar: '', avatar2: '', avatar3: '', avatar4: '', avatar5: '' },
   );
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -14,10 +14,11 @@ const Register = ({ onLogin }) => {
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    if(type === 'file') {
-        setUser(prev => ({ ...prev, [name]: e.target.files[0] }));
-    }else{
-        setUser(prev => ({ ...prev, [name]: value }));
+    if (type === 'file') {
+      const file = e.target.files[0];
+      setUser(prev => ({ ...prev, [name]: file }));
+    } else {
+      setUser(prev => ({ ...prev, [name]: value }));
     }
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -43,10 +44,22 @@ const Register = ({ onLogin }) => {
       newErrors.confirmPassword = 'Пароли не совпадают';
     }
     if (!user.role) {
-        newErrors.role = 'Выберите роль';
+      newErrors.role = 'Выберите роль';
     }
-    if (!user.avatar) {
-        newErrors.avatar = 'Выберите аватар';
+    if (!user.avatar || user.avatar.length === 0) {
+      newErrors.avatar = 'Загрузите 1 фото';
+    }
+    if (!user.avatar2 || user.avatar2.length === 0) {
+      newErrors.avatar2 = 'Загрузите 2 фото';
+    }
+    if (!user.avatar3 || user.avatar3.length === 0) {
+      newErrors.avatar3 = 'Загрузите 3 фото';
+    }
+    if (!user.avatar4 || user.avatar4.length === 0) {
+      newErrors.avatar4 = 'Загрузите 4 фото';
+    }
+    if (!user.avatar5 || user.avatar5.length === 0) {
+      newErrors.avatar5 = 'Загрузите 5 фото';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -56,25 +69,35 @@ const Register = ({ onLogin }) => {
     e.preventDefault();
     if (!validateForm()) return;
     setIsLoading(true);
-  console.log('[Register] submit', { user });
-  console.log('[Register] API_URL', API_URL);
+    console.log('[Register] submit', { user });
+    console.log('[Register] API_URL', API_URL);
     try {
-      
+
       const form = new FormData();
       form.append('name', user.name || '');
       form.append('email', user.email || '');
       form.append('password', user.password || '');
       form.append('role', user.role || 'student');
-      if(user.avatar instanceof File) {
-          form.append('avatar', user.avatar);
+      if (user.avatar instanceof File) {
+        form.append('avatar', user.avatar);
       }
-
-
+      if (user.avatar2 instanceof File) {
+        form.append('avatar2', user.avatar2);
+      }
+      if (user.avatar3 instanceof File) {
+        form.append('avatar3', user.avatar3);
+      }
+      if (user.avatar4 instanceof File) {
+        form.append('avatar4', user.avatar4);
+      }
+      if (user.avatar5 instanceof File) {
+        form.append('avatar5', user.avatar5);
+      }
       const response = await axios({
-          method: 'post',
-          url: API_URL,
-          data: form,
-          headers: {'Content-Type': 'multipart/form-data'},
+        method: 'post',
+        url: API_URL,
+        data: form,
+        headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 15000,
       });
 
@@ -84,7 +107,7 @@ const Register = ({ onLogin }) => {
       if (response.status === 200 || response.status === 201) {
         const created = response.data?.data || response.data || {};
         console.log('[Register] created user normalized:', created);
-        
+
         if (typeof onLogin === 'function') {
           try {
             await onLogin(user.email, user.password);
@@ -92,7 +115,7 @@ const Register = ({ onLogin }) => {
             console.warn('[Register] onLogin failed:', loginErr);
           }
         }
-        
+
         navigate('/');
       } else {
         const serverMsg = response.data?.error || response.data?.message || JSON.stringify(response.data);
@@ -100,7 +123,7 @@ const Register = ({ onLogin }) => {
         setErrors({ general: serverMsg || 'Ошибка регистрации' });
       }
     } catch (err) {
-      
+
       console.error('[Register] Exception during registration:', err);
       if (err?.response) {
         console.error('[Register] err.response.data:', err.response.data);
@@ -228,9 +251,19 @@ const Register = ({ onLogin }) => {
             )}
           </div>
 
-            <div className="form-group">
-                <input type="file" id="avatar" name="avatar" onChange={handleChange} className="form-input" disabled={isLoading} />
-            </div>
+          <div className="form-group">
+            <label htmlFor="avatar" className="form-label">
+              Фото профиля (можно загрузить до 5 фото)
+            </label>
+            {errors.avatar && (
+              <span className="error-message">{errors.avatar}</span>
+            )}
+            <input type="file" id="avatar" name="avatar" onChange={handleChange} className="form-input" disabled={isLoading} />
+            <input type="file" id="avatar2" name="avatar2" onChange={handleChange} className="form-input" disabled={isLoading} />
+            <input type="file" id="avatar3" name="avatar3" onChange={handleChange} className="form-input" disabled={isLoading} />
+            <input type="file" id="avatar4" name="avatar4" onChange={handleChange} className="form-input" disabled={isLoading} />
+            <input type="file" id="avatar5" name="avatar5" onChange={handleChange} className="form-input" disabled={isLoading} />
+          </div>
 
           <div className="form-actions">
             <button

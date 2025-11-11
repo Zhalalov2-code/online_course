@@ -28,6 +28,18 @@ function Profile() {
             if (formData.avatar instanceof File) {
                 formDataToSend.append('avatar', formData.avatar);
             }
+            if (formData.avatar2 instanceof File) {
+                formDataToSend.append('avatar2', formData.avatar2);
+            }
+            if (formData.avatar3 instanceof File) {
+                formDataToSend.append('avatar3', formData.avatar3);
+            }
+            if (formData.avatar4 instanceof File) {
+                formDataToSend.append('avatar4', formData.avatar4);
+            }
+            if (formData.avatar5 instanceof File) {
+                formDataToSend.append('avatar5', formData.avatar5);
+            }
 
             const res = await axios({
                 method: 'POST',

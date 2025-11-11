@@ -6,6 +6,10 @@ function ModalEditProfile({ isOpen, onClose, userData, onSave }) {
         name: userData?.name || '',
         email: userData?.email || '',
         avatar: userData?.avatar || '',
+        avatar2: userData?.avatar2 || '',
+        avatar3: userData?.avatar3 || '',
+        avatar4: userData?.avatar4 || '',
+        avatar5: userData?.avatar5 || '',
     });
 
     const handleChange = (e) => {
@@ -61,11 +65,47 @@ function ModalEditProfile({ isOpen, onClose, userData, onSave }) {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="bio">Фото профиля</label>
+                        <label htmlFor="bio">Фото профиля 1</label>
                         <input
                             type="file"
                             id="avatar"
                             name="avatar"
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="bio">Фото профиля 2</label>
+                        <input
+                            type="file"
+                            id="avatar2"
+                            name="avatar2"
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="bio">Фото профиля 3</label>
+                        <input
+                            type="file"
+                            id="avatar3"
+                            name="avatar3"
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="bio">Фото профиля 4</label>
+                        <input
+                            type="file"
+                            id="avatar4"
+                            name="avatar4"
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="bio">Фото профиля 5</label>
+                        <input
+                            type="file"
+                            id="avatar5"
+                            name="avatar5"
                             onChange={handleChange}
                         />
                     </div>
